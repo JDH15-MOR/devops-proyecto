@@ -1,0 +1,17 @@
+#Dependencias
+node_modules/
+__pycache__/
+.venv/
+*.pyc
+#Variables de entorno (nunca subir a repo)
+.env
+.env.local
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Archivos compilados
+dist/
+build/
+*.log
