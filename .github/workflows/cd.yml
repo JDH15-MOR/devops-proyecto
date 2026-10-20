@@ -18,6 +18,11 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
+      - name: Verificar configuración del ambiente
+        run: |
+          echo "Ambiente: ${{ vars.APP_ENV }}"
+          echo "DB configurada: ${{ secrets.DB_URL != '' && 'SI' || 'NO' }}"
+
       - name: Simular deploy en Staging
         run: |
           echo "========================================="
@@ -39,6 +44,11 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
+      - name: Verificar configuración del ambiente
+        run: |
+          echo "Ambiente: ${{ vars.APP_ENV }}"
+          echo "DB configurada: ${{ secrets.DB_URL != '' && 'SI' || 'NO' }}"
+
       - name: Simular deploy en Producción
         run: |
           echo "========================================="
@@ -48,3 +58,4 @@ jobs:
           echo "  Réplicas: ${{ vars.REPLICA_COUNT }}"
           echo "========================================="
           echo "Deploy completado exitosamente en producción"
+          
