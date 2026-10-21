@@ -13,6 +13,6 @@ def multiplicar(a, b):
 def dividir(a, b):
     if b == 0:
         raise ZeroDivisionError(
-            "El divisor no puede ser cero. Proporciona un numero distinto de 0."
+            "El divisor no puede ser cero. Dame un numero distinto de 0."
         )
     return a / b
