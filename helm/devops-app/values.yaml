@@ -1,0 +1,41 @@
+replicaCount: 1
+
+image:
+  repository: jdh15/devops-app
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    memory: "32Mi"
+    cpu: "10m"
+  limits:
+    memory: "64Mi"
+    cpu: "100m"
+
+persistence:
+  enabled: true
+  existingClaim: app-data-pvc
+  mountPath: /app/data
+
+configMap:
+  name: devops-app-config
+
+secret:
+  name: devops-app-secret
+
+gatewayApi:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+serviceAccount:
+  create: false

@@ -1,0 +1,3 @@
+{{- if .Values.gatewayApi.enabled }}
+# HTTPRoute administrado fuera de este Chart.
+{{- end }}
