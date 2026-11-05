@@ -8,54 +8,51 @@ on:
 
 jobs:
   deploy-staging:
-    name: Deploy → Staging
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Helm deploy en Staging
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     environment: staging
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout del commit validado por CI
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-      - name: Verificar configuración del ambiente
-        run: |
-          echo "Ambiente: ${{ vars.APP_ENV }}"
-          echo "DB configurada: ${{ secrets.DB_URL != '' && 'SI' || 'NO' }}"
+      - name: Configurar Helm
+        uses: azure/setup-helm@v4
 
-      - name: Simular deploy en Staging
-        run: |
-          echo "========================================="
-          echo "  DEPLOY A STAGING"
-          echo "  Versión: ${{ github.event.workflow_run.head_sha }}"
-          echo "  Ambiente: ${{ vars.APP_ENV }}"
-          echo "  Réplicas: ${{ vars.REPLICA_COUNT }}"
-          echo "========================================="
-          echo "Deploy completado exitosamente en staging"
-
-  deploy-production:
-    name: Deploy → Production
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-    environment: production
-
-    steps:
-      - uses: actions/checkout@v4
+      - name: Configurar kubectl
+        uses: azure/setup-kubectl@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          version: 'v1.36.0'
 
-      - name: Verificar configuración del ambiente
+      - name: Configurar kubeconfig de AKS
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         run: |
-          echo "Ambiente: ${{ vars.APP_ENV }}"
-          echo "DB configurada: ${{ secrets.DB_URL != '' && 'SI' || 'NO' }}"
+          mkdir -p "$HOME/.kube"
+          printf '%s' "$KUBE_CONFIG" > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
 
-      - name: Simular deploy en Producción
+      - name: Verificar conexión con AKS
+        run: kubectl get nodes
+
+      - name: Desplegar aplicación con Helm
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
         run: |
-          echo "========================================="
-          echo "  DEPLOY A PRODUCCIÓN"
-          echo "  Versión: ${{ github.event.workflow_run.head_sha }}"
-          echo "  Ambiente: ${{ vars.APP_ENV }}"
-          echo "  Réplicas: ${{ vars.REPLICA_COUNT }}"
-          echo "========================================="
-          echo "Deploy completado exitosamente en producción"
-          
+          helm upgrade --install devops-app helm/devops-app \
+            --namespace staging \
+            --create-namespace \
+            --set image.repository="${DOCKERHUB_USERNAME}/devops-app" \
+            --set image.tag="${IMAGE_TAG}" \
+            --wait \
+            --timeout 5m
+
+      - name: Verificar despliegue
+        run: |
+          kubectl rollout status deployment/devops-app -n staging --timeout=180s
+          kubectl get pods -n staging
+          helm status devops-app -n staging
