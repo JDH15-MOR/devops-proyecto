@@ -4,12 +4,11 @@ metadata:
   name: devops-app-svc
   namespace: {{ .Release.Namespace }}
   labels:
-    app: devops-app
-    app.kubernetes.io/managed-by: Helm
+    {{- include "devops-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
-    app: devops-app
+    {{- include "devops-app.selectorLabels" . | nindent 4 }}
   ports:
     - name: http
       port: {{ .Values.service.port }}
