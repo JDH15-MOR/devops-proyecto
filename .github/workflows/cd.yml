@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   deploy-staging:
-    name: Deploy → Staging
+    name: Helm deploy en Staging
     if: >-
       ${{
         github.event.workflow_run.conclusion == 'success' &&
@@ -21,7 +21,7 @@ jobs:
     environment: staging
 
     steps:
-      - name: Clonar repositorio
+      - name: Checkout del commit validado por CI
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
@@ -39,19 +39,28 @@ jobs:
             --admin \
             --overwrite-existing
 
-      - name: Instalar Helm
+      - name: Configurar Helm
         uses: azure/setup-helm@v4
         with:
           version: v3.16.4
 
-      - name: Helm deploy en Staging
+      - name: Configurar kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.36.0
+
+      - name: Desplegar aplicación con Helm
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
         run: |
           helm upgrade --install devops-app helm/devops-app \
             --namespace staging \
             --create-namespace \
-            --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/devops-app \
-            --set image.tag=${{ github.event.workflow_run.head_sha }} \
-            --wait --timeout 5m
+            --set image.repository="${DOCKERHUB_USERNAME}/devops-app" \
+            --set image.tag="${IMAGE_TAG}" \
+            --wait \
+            --timeout 5m
 
       - name: Verificar despliegue
         run: |
@@ -59,6 +68,7 @@ jobs:
             --namespace staging --timeout=5m
           kubectl get pods -n staging
           kubectl get services -n staging
+          helm status devops-app -n staging
 
   deploy-production:
     name: Deploy → Production
@@ -67,14 +77,10 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout del commit validado por CI
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Verificar configuración del ambiente
-        run: |
-          echo "Ambiente: ${{ vars.APP_ENV }}"
-          echo "DB configurada: ${{ secrets.DB_URL != '' && 'SI' || 'NO' }}"
 
       - name: Simular deploy en Producción
         run: |

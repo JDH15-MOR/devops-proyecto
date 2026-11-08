@@ -1,0 +1,13 @@
+La aplicación {{ .Release.Name }} fue desplegada en el namespace {{ .Release.Namespace }}.
+
+Verifica los recursos con:
+
+  kubectl get deployment,service,pods -n {{ .Release.Namespace }}
+
+El servicio interno es:
+
+  devops-app-svc:{{ .Values.service.port }}
+
+El almacenamiento persistente utiliza el PVC:
+
+  {{ .Values.persistence.existingClaim }}

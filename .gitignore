@@ -23,3 +23,5 @@ secret.yaml
 
 # Respaldos locales
 *.bak
+# Credenciales locales de AKS
+kubeconfig-s25
