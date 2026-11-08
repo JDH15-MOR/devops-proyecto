@@ -16,3 +16,10 @@ dist/
 build/
 *.log
 test-results/
+
+# Credenciales y configuraciones locales de Kubernetes
+kubeconfig*
+secret.yaml
+
+# Respaldos locales
+*.bak
