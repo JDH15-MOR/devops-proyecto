@@ -46,8 +46,9 @@ jobs:
 
       - name: Verificar configuración del ambiente
         run: |
-          echo "Ambiente: ${{ vars.APP_ENV }}"
-          echo "DB configurada: ${{ secrets.DB_URL != '' && 'SI' || 'NO' }}"
+          mkdir -p "$HOME/.kube"
+          printf '%s' "$KUBE_CONFIG" > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
 
       - name: Simular deploy en Producción
         run: |
