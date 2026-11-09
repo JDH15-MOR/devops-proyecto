@@ -21,7 +21,7 @@ resources:
     cpu: "100m"
 
 persistence:
-  enabled: true
+  enabled: false
   existingClaim: app-data-pvc
   mountPath: /app/data
 
@@ -38,4 +38,6 @@ autoscaling:
   enabled: false
 
 serviceAccount:
-  create: false
+  create: true
+  automount: true
+  name: ""
