@@ -52,6 +52,17 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Validar Subscription ID
+        shell: bash
+        run: |
+          if [[ "$ARM_SUBSCRIPTION_ID" =~ ^[0-9a-fA-F-]{36}$ ]]; then
+            echo "Subscription ID: formato correcto"
+          else
+            echo "ERROR: Subscription ID inválido"
+            echo "Longitud: ${#ARM_SUBSCRIPTION_ID}"
+            exit 1
+          fi
 
       - name: Terraform Init
         run: terraform init -input=false
