@@ -19,6 +19,8 @@ terraform {
     storage_account_name = "tfstatedevops6a881a37"
     container_name       = "tfstate"
     key                  = "devops-academia.tfstate"
+
+    use_cli = false
   }
 }
 
