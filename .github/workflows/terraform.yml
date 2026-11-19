@@ -26,7 +26,6 @@ jobs:
     name: Plan y Apply
     runs-on: ubuntu-latest
 
-    # Los secretos no están disponibles en PRs externos.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
 
     defaults:
@@ -47,12 +46,12 @@ jobs:
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.17.0"
-      
+
       - name: Login en Azure
         uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
+
       - name: Validar Subscription ID
         shell: bash
         run: |
@@ -60,7 +59,6 @@ jobs:
             echo "Subscription ID: formato correcto"
           else
             echo "ERROR: Subscription ID inválido"
-            echo "Longitud: ${#ARM_SUBSCRIPTION_ID}"
             exit 1
           fi
 
@@ -79,3 +77,4 @@ jobs:
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform apply -input=false -auto-approve tfplan
+
