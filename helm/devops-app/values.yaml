@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: jdh15/devops-app
-  tag: "latest"
+  tag: "s32"
   pullPolicy: IfNotPresent
 
 service:

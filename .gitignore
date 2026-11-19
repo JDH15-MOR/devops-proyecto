@@ -58,3 +58,9 @@ terraform.tfstate.backup
 *.pfx
 credentials.json
 secrets.json
+
+# Archivos sensibles y reportes locales
+kubeconfig-s25
+secret.yaml
+gitleaks-report.json
+trivy-report.json
