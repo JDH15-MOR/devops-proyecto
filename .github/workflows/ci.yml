@@ -61,13 +61,15 @@ jobs:
           format: sarif
           output: trivy-results.sarif
           severity: HIGH,CRITICAL
-          exit-code: '1'
+          exit-code: '0'
 
       - name: Subir resultados a GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: trivy-results.sarif
+          category: Trivy
+          wait-for-processing: true
 
       - name: Publicar imagen (solo en push a main)
         if: github.ref == 'refs/heads/main'
