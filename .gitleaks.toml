@@ -1,0 +1,9 @@
+title = "DevOps project Gitleaks configuration"
+useDefault = true
+
+[[allowlists]]
+description = "Exclude generated security reports"
+paths = [
+    '''(^|/)gitleaks-report\.json$''',
+    '''(^|/)trivy-report\.json$'''
+]
