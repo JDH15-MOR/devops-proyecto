@@ -8,24 +8,24 @@ resource "azurerm_resource_group" "main" {
   }
 }
 
-resource "azurerm_virtual_network" "main" {
-  name                = "vnet-${var.environment}-devops"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  address_space       = ["10.0.0.0/16"]
-}
+#resource "azurerm_virtual_network" "main" {
+#  name                = "vnet-${var.environment}-devops"
+#  resource_group_name = azurerm_resource_group.main.name
+#  location            = azurerm_resource_group.main.location
+#  address_space       = ["10.0.0.0/16"]
+#}
 
-resource "random_id" "storage_suffix" {
-  byte_length = 4
-}
+#resource "random_id" "storage_suffix" {
+#  byte_length = 4
+#}
 
-resource "azurerm_storage_account" "main" {
-  name                     = "st${var.environment}devops${random_id.storage_suffix.hex}"
-  resource_group_name      = azurerm_resource_group.main.name
-  location                 = azurerm_resource_group.main.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
+#resource "azurerm_storage_account" "main" {
+#  name                     = "st${var.environment}devops${random_id.storage_suffix.hex}"
+#  resource_group_name      = azurerm_resource_group.main.name
+#  location                 = azurerm_resource_group.main.location
+#  account_tier             = "Standard"
+#  account_replication_type = "LRS"
+#}
 
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = "aks-${var.environment}-devops"
@@ -33,26 +33,23 @@ resource "azurerm_kubernetes_cluster" "aks" {
   resource_group_name = azurerm_resource_group.main.name
   dns_prefix          = "aks${var.environment}devops"
 
-  oidc_issuer_enabled = true
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
 
-  node_provisioning_profile {
-    mode = "Manual"
+  identity {
+    type = "SystemAssigned"
   }
 
   default_node_pool {
     name       = "default"
     node_count = var.node_count
-    vm_size    = "Standard_D2ds_v4"
+    vm_size    = var.vm_size
 
     upgrade_settings {
       max_surge                     = "10%"
       drain_timeout_in_minutes      = 0
       node_soak_duration_in_minutes = 0
     }
-  }
-
-  identity {
-    type = "SystemAssigned"
   }
 
   tags = {
