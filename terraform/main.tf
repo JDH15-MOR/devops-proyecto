@@ -15,7 +15,7 @@ resource "azurerm_virtual_network" "main" {
 }
 
 resource "azurerm_storage_account" "main" {
-  name                     = "st${var.environment}devops${substr(md5(var.environment), 0, 5)}"
+  name                     = "st${var.environment}jdh${substr(md5(var.environment), 0, 8)}"
   resource_group_name      = azurerm_resource_group.main.name
   location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
@@ -27,6 +27,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   dns_prefix          = "aks${var.environment}devops"
+
+  node_provisioning_profile {
+    mode = "Manual"
+  }
 
   default_node_pool {
     name       = "default"
@@ -41,5 +45,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
   tags = {
     environment = var.environment
     project     = "devops-academia"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      default_node_pool[0].upgrade_settings
+    ]
   }
 }
