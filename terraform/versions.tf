@@ -5,12 +5,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 5.14"
-    }
-
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
+      version = "~> 3.80"
     }
   }
 
@@ -20,7 +15,6 @@ terraform {
     container_name       = "tfstate"
     key                  = "devops-academia.tfstate"
 
-    use_cli = false
   }
 }
 

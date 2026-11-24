@@ -15,3 +15,9 @@ variable "node_count" {
   type        = number
   default     = 2
 }
+
+variable "vm_size" {
+  description = "Tamaño de la máquina virtual de AKS"
+  type        = string
+  default     = "Standard_b2s_v2"
+}
