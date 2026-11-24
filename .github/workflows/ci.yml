@@ -44,7 +44,7 @@ jobs:
       - name: Ejecutar tests unitarios
         run: pytest tests/ -v --tb=short --junitxml=test-results/results.xml
       - name: Publicar resultados de tests
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.run_number }}
